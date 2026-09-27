@@ -1,6 +1,7 @@
 import ast
 import hashlib
 from pathlib import Path
+from .models import Chunk
 
 
 def parse_python(source: str) -> ast.AST:
@@ -75,3 +76,80 @@ def get_language(path: Path) -> str:
         return "python"
 
     return "unknown"
+
+
+def get_chunk_id( relative_path: str, symbol: str, chunk_type: str) -> str:
+    """
+    Return a stable identifier for a code chunk.
+    """
+    identity = f"{relative_path}::{chunk_type}::{symbol}"
+    return hashlib.sha256(identity.encode("utf-8")).hexdigest()
+
+def build_chunk( path: Path, relative_path: str, source: str, node: ast.AST ) -> Chunk:
+    """
+    Build a Chunk object from an AST node.
+    """
+    name, start_line, end_line = get_node_info(node)
+    content = get_node_content(source, node)
+    chunk_type = get_chunk_type(node)
+    content_hash = get_content_hash(content)
+    language = get_language(path)
+    chunk_id = get_chunk_id(relative_path, name, chunk_type)
+
+    return Chunk(
+        id=chunk_id,
+        path=relative_path,
+        language=language,
+        chunk_type=chunk_type,
+        symbol=name,
+        start_line=start_line,
+        end_line=end_line,
+        content_hash=content_hash,
+        content=content,
+    )
+
+def print_chunk(chunk: Chunk) -> None:
+    """
+    Print a chunk for debugging purposes.
+    """
+    print("----- CHUNK -----")
+    print(f"ID: {chunk.id}")
+    print(f"Path: {chunk.path}")
+    print(f"Language: {chunk.language}")
+    print(f"Type: {chunk.chunk_type}")
+    print(f"Symbol: {chunk.symbol}")
+    print(f"Lines: {chunk.start_line}-{chunk.end_line}")
+    print(f"Hash: {chunk.content_hash}")
+    print("Content:")
+    print(chunk.content)
+
+def main() -> None:
+    source = """
+def add(a, b):
+    return a + b
+
+
+class Calculator:
+    def multiply(self, a, b):
+        return a * b
+"""
+
+    path = Path("calculator.py")
+    relative_path = "calculator.py"
+
+    tree = parse_python(source)
+    definitions = find_definitions(tree)
+
+    for node in definitions:
+        chunk = build_chunk(
+            path=path,
+            relative_path=relative_path,
+            source=source,
+            node=node,
+        )
+
+        print_chunk(chunk)
+
+
+if __name__ == "__main__":
+    main()
