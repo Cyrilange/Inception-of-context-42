@@ -1,25 +1,27 @@
 from pathlib import Path
 
-
-SUPPORTED_EXTENSIONS = {
-    ".py",
-    ".js",
-    ".ts",
-    ".java",
-    ".go",
-    ".rs",
-    ".c",
-    ".h",
-    ".cpp",
-    ".hpp",
-    ".json",
-    ".yaml",
-    ".yml",
-    ".toml",
-    ".md",
-    ".txt",
-    ".sh",
+LANGUAGES = {
+    ".py": "python",
+    ".js": "javascript",
+    ".ts": "typescript",
+    ".java": "java",
+    ".go": "go",
+    ".rs": "rust",
+    ".c": "c",
+    ".h": "c",
+    ".cpp": "cpp",
+    ".hpp": "cpp",
+    ".json": "json",
+    ".yaml": "yaml",
+    ".yml": "yaml",
+    ".toml": "toml",
+    ".md": "markdown",
+    ".txt": "text",
+    ".sh": "shell",
 }
+
+
+SUPPORTED_EXTENSIONS = set(LANGUAGES)
 
 
 IGNORED_DIRECTORIES = {

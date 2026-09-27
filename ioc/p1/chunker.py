@@ -1,6 +1,8 @@
 import ast
 import hashlib
 from pathlib import Path
+
+from .config import LANGUAGES
 from .models import Chunk
 
 
@@ -66,17 +68,6 @@ def get_content_hash(content: str) -> str:
     """
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
-def get_language(path: Path) -> str:
-    """
-    Return the programming language based on the file extension.
-    """
-    extension = path.suffix.lower()
-
-    if extension == ".py":
-        return "python"
-
-    return "unknown"
-
 
 def get_chunk_id( relative_path: str, symbol: str, chunk_type: str) -> str:
     """
@@ -108,6 +99,18 @@ def build_chunk( path: Path, relative_path: str, source: str, node: ast.AST ) ->
         content=content,
     )
 
+
+def get_language(path: Path) -> str:
+    """
+    Return the language or format based on the file extension.
+    """
+    return LANGUAGES.get(path.suffix.lower(), "unknown")
+
+
+
+#test 
+
+
 def print_chunk(chunk: Chunk) -> None:
     """
     Print a chunk for debugging purposes.
@@ -127,6 +130,8 @@ def main() -> None:
     source = """
 def add(a, b):
     return a + b
+    
+
 
 
 class Calculator:
