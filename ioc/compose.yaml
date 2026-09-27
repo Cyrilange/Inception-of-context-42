@@ -1,0 +1,48 @@
+services:
+
+  ioc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: ioc
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/app
+      - chroma-data:/app/data
+
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      INSTRUCT_MODEL: qwen2.5:3b
+      CODER_MODEL: qwen2.5-coder:3b
+      CHROMA_PATH: /app/data/chroma
+
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+
+    container_name: ioc-ollama
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ollama-data:/root/.ollama
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+
+volumes:
+  chroma-data:
+  ollama-data:

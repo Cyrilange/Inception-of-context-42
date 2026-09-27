@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+chromadb
+sentence-transformers
+watchdog
+httpx
+pyyaml
+pytest
